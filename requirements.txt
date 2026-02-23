@@ -1,0 +1,2 @@
+# Altered Sealed Simulator
+# Python 3.10+
