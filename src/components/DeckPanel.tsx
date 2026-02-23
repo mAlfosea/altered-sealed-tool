@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Card } from "@/lib/types";
 import { cardDisplayName } from "@/lib/types";
 import { useSealedStore } from "@/store/useSealedStore";
@@ -9,6 +9,8 @@ import { getFactionBorderClass, getFactionBorderStyle, getFactionBgStyle } from 
 import { Button } from "@/components/ui/button";
 import { Card as CardUi } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import type { AnchorRect } from "@/components/CardHoverPreview";
+import { CardHoverPreview } from "@/components/CardHoverPreview";
 import { Download, Minus, Star, Trash2 } from "lucide-react";
 
 const MAX_FACTIONS = 3;
@@ -39,6 +41,14 @@ export function DeckPanel({ onExportClick }: DeckPanelProps) {
 
   const mainCount = getMainCount();
   const tokenCount = getTokenCount();
+  const [hoveredCard, setHoveredCard] = useState<Card | null>(null);
+  const [anchorRect, setAnchorRect] = useState<AnchorRect | null>(null);
+
+  const setHover = (card: Card | null, el: HTMLElement | null) => {
+    setHoveredCard(card);
+    setAnchorRect(card && el ? (el.getBoundingClientRect() as AnchorRect) : null);
+  };
+
   const factions = useMemo(
     () => getDeckFactions(deck, cardsById),
     [deck, cardsById]
@@ -133,6 +143,8 @@ export function DeckPanel({ onExportClick }: DeckPanelProps) {
             <div
               className={`flex items-center justify-between rounded border p-2.5 ${getFactionBorderClass(heroCard.faction)}`}
               style={{ ...getFactionBgStyle(heroCard.faction), ...getFactionBorderStyle(heroCard.faction) }}
+              onMouseEnter={(e) => setHover(heroCard, e.currentTarget)}
+              onMouseLeave={() => setHover(null, null)}
             >
               <div className="flex min-w-0 flex-1 items-center justify-start gap-1.5">
                 <span className="truncate text-base font-medium">{cardDisplayName(heroCard)}</span>
@@ -176,6 +188,8 @@ export function DeckPanel({ onExportClick }: DeckPanelProps) {
                       key={cardId}
                       className={`flex items-center justify-between gap-2 rounded border px-2.5 py-1.5 text-base ${getFactionBorderClass(card.faction)}`}
                       style={{ ...getFactionBgStyle(card.faction), ...getFactionBorderStyle(card.faction) }}
+                      onMouseEnter={(e) => setHover(card, e.currentTarget)}
+                      onMouseLeave={() => setHover(null, null)}
                     >
                       <div className="flex min-w-0 flex-1 items-center justify-start gap-2">
                         <span
@@ -226,6 +240,8 @@ export function DeckPanel({ onExportClick }: DeckPanelProps) {
                     key={cardId}
                     className={`flex items-center justify-between gap-2 rounded border px-2.5 py-1.5 text-base ${getFactionBorderClass(card.faction)}`}
                     style={{ ...getFactionBgStyle(card.faction), ...getFactionBorderStyle(card.faction) }}
+                    onMouseEnter={(e) => setHover(card, e.currentTarget)}
+                    onMouseLeave={() => setHover(null, null)}
                   >
                     <div className="flex min-w-0 flex-1 items-center justify-start gap-2">
                       <span
@@ -257,6 +273,7 @@ export function DeckPanel({ onExportClick }: DeckPanelProps) {
           </>
         )}
       </div>
+      <CardHoverPreview card={hoveredCard} anchorRect={anchorRect} />
     </CardUi>
   );
 }

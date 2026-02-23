@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Card } from "@/lib/types";
 import { cardDisplayName } from "@/lib/types";
 import type { CollectionEntry } from "@/store/useSealedStore";
@@ -8,6 +8,8 @@ import { Card as CardUi } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSealedStore } from "@/store/useSealedStore";
 import { cn } from "@/lib/utils";
+import type { AnchorRect } from "@/components/CardHoverPreview";
+import { CardHoverPreview } from "@/components/CardHoverPreview";
 
 /** Ordre des factions pour le tri (héros puis cartes). */
 const FACTION_ORDER = ["AX", "BR", "LY", "MU", "OR", "YZ", "NEUTRAL", "NE"];
@@ -42,17 +44,22 @@ interface CollectionGridProps {
 function CardTile({
   card,
   qty,
+  inDeck,
   onAdd,
   onRemove,
+  onHoverChange,
   disabled,
 }: {
   card: Card;
   qty: number;
+  inDeck: number;
   onAdd: (cardId: string, isToken: boolean, qty?: number) => void;
   onRemove?: (cardId: string, isToken: boolean, qty?: number) => void;
+  onHoverChange?: (card: Card | null, anchorEl: HTMLElement | null) => void;
   disabled?: boolean;
 }) {
   const isToken = card.type === "TOKEN" || card.type === "MANA";
+  const allInDeck = qty > 0 && inDeck >= qty;
 
   const handleClick = (e: React.MouseEvent) => {
     if (disabled) return;
@@ -74,6 +81,8 @@ function CardTile({
       )}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
+      onMouseEnter={(e) => onHoverChange?.(card, e.currentTarget as HTMLElement)}
+      onMouseLeave={() => onHoverChange?.(null, null)}
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-t-lg bg-muted">
         {card.imageUrl ? (
@@ -88,7 +97,15 @@ function CardTile({
           </div>
         )}
         <div className="absolute right-1 top-1">
-          <Badge variant="secondary">×{qty}</Badge>
+          <Badge
+            variant="secondary"
+            className={cn(
+              "tabular-nums",
+              allInDeck && "font-semibold text-red-600"
+            )}
+          >
+            {inDeck}/{qty}
+          </Badge>
         </div>
       </div>
       <div className="p-2">
@@ -96,6 +113,10 @@ function CardTile({
       </div>
     </CardUi>
   );
+}
+
+function getInDeckCount(deck: { main: Record<string, number>; tokens: Record<string, number> }, cardId: string): number {
+  return (deck.main[cardId] ?? 0) + (deck.tokens[cardId] ?? 0);
 }
 
 export function CollectionGrid({
@@ -108,6 +129,14 @@ export function CollectionGrid({
   onRemoveCard,
 }: CollectionGridProps) {
   const cardsById = useSealedStore((s) => s.cardsById);
+  const deck = useSealedStore((s) => s.deck);
+  const [hoveredCard, setHoveredCard] = useState<Card | null>(null);
+  const [anchorRect, setAnchorRect] = useState<AnchorRect | null>(null);
+
+  const handleHoverChange = (card: Card | null, el: HTMLElement | null) => {
+    setHoveredCard(card);
+    setAnchorRect(card && el ? (el.getBoundingClientRect() as AnchorRect) : null);
+  };
 
   const filtered = useMemo(() => {
     const lower = search.toLowerCase();
@@ -156,16 +185,21 @@ export function CollectionGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-      {toShow.map(({ card, qty }) => (
-        <CardTile
-          key={card.id}
-          card={card}
-          qty={qty}
-          onAdd={onAddCard}
-          onRemove={onRemoveCard}
-        />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        {toShow.map(({ card, qty }) => (
+          <CardTile
+            key={card.id}
+            card={card}
+            qty={qty}
+            inDeck={getInDeckCount(deck, card.id)}
+            onAdd={onAddCard}
+            onRemove={onRemoveCard}
+            onHoverChange={handleHoverChange}
+          />
+        ))}
+      </div>
+      <CardHoverPreview card={hoveredCard} anchorRect={anchorRect} />
+    </>
   );
 }
