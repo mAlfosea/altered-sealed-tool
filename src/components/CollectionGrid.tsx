@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import type { Card } from "@/lib/types";
+import { cardDisplayName } from "@/lib/types";
 import type { CollectionEntry } from "@/store/useSealedStore";
 import { Card as CardUi } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +10,19 @@ import { useSealedStore } from "@/store/useSealedStore";
 import { cn } from "@/lib/utils";
 
 /** Ordre des factions pour le tri (héros puis cartes). */
-const FACTION_ORDER = ["AX", "BR", "LY", "MU", "OR", "YZ", "NEUTRAL"];
+const FACTION_ORDER = ["AX", "BR", "LY", "MU", "OR", "YZ", "NEUTRAL", "NE"];
+
+/** Libellés des factions pour l’affichage. */
+export const FACTION_LABELS: Record<string, string> = {
+  AX: "Axiom",
+  BR: "Bravos",
+  LY: "Lyra",
+  MU: "Muna",
+  OR: "Ordis",
+  YZ: "Yzmir",
+  NEUTRAL: "Neutral",
+  NE: "NE",
+};
 
 function factionIndex(faction: string): number {
   const i = FACTION_ORDER.indexOf(faction);
@@ -19,10 +32,9 @@ function factionIndex(faction: string): number {
 interface CollectionGridProps {
   entries: CollectionEntry[];
   search: string;
-  factionFilter: string;
-  rarityFilter: string;
-  typeFilter: string;
-  groupByName: boolean;
+  activeFactions: string[];
+  activeRarities: string[];
+  activeTypes: string[];
   onAddCard: (cardId: string, isToken: boolean, qty?: number) => void;
   onRemoveCard?: (cardId: string, isToken: boolean, qty?: number) => void;
 }
@@ -67,12 +79,12 @@ function CardTile({
         {card.imageUrl ? (
           <img
             src={card.imageUrl}
-            alt={card.name}
+            alt={cardDisplayName(card)}
             className="h-full w-full object-cover"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-            {card.name.slice(0, 20)}
+            {cardDisplayName(card).slice(0, 20)}
           </div>
         )}
         <div className="absolute right-1 top-1">
@@ -80,18 +92,7 @@ function CardTile({
         </div>
       </div>
       <div className="p-2">
-        <p className="truncate text-sm font-medium">{card.name}</p>
-        <div className="flex flex-wrap gap-1">
-          <Badge variant="outline" className="text-[10px]">
-            {card.faction}
-          </Badge>
-          <Badge variant="outline" className="text-[10px]">
-            {card.rarity}
-          </Badge>
-          <Badge variant="outline" className="text-[10px]">
-            {card.type}
-          </Badge>
-        </div>
+        <p className="truncate text-sm font-medium">{cardDisplayName(card)}</p>
       </div>
     </CardUi>
   );
@@ -100,10 +101,9 @@ function CardTile({
 export function CollectionGrid({
   entries,
   search,
-  factionFilter,
-  rarityFilter,
-  typeFilter,
-  groupByName,
+  activeFactions,
+  activeRarities,
+  activeTypes,
   onAddCard,
   onRemoveCard,
 }: CollectionGridProps) {
@@ -112,46 +112,40 @@ export function CollectionGrid({
   const filtered = useMemo(() => {
     const lower = search.toLowerCase();
     return entries.filter(({ card }) => {
-      if (lower && !card.name.toLowerCase().includes(lower)) return false;
-      if (factionFilter && card.faction !== factionFilter) return false;
-      if (rarityFilter && card.rarity !== rarityFilter) return false;
-      if (typeFilter && card.type !== typeFilter) return false;
+      if (lower && !card.nameFr.toLowerCase().includes(lower) && !card.nameEn.toLowerCase().includes(lower)) return false;
+      if (activeFactions.length > 0 && !activeFactions.includes(card.faction)) return false;
+      if (activeRarities.length > 0 && !activeRarities.includes(card.rarity)) return false;
+      if (activeTypes.length > 0 && !activeTypes.includes(card.type)) return false;
       return true;
     });
-  }, [entries, search, factionFilter, rarityFilter, typeFilter]);
+  }, [entries, search, activeFactions, activeRarities, activeTypes]);
 
   const toShow = useMemo(() => {
-    let list: { card: Card; qty: number }[];
-    if (groupByName) {
-      const byId = new Map<string, { card: Card; qty: number }>();
-      for (const { card, qty } of filtered) {
-        const cur = byId.get(card.id);
-        if (cur) cur.qty += qty;
-        else byId.set(card.id, { card, qty });
-      }
-      list = Array.from(byId.entries()).map(([, entry]) => entry);
-    } else {
-      list = filtered.map(({ card, qty }) => ({ card, qty }));
+    const byId = new Map<string, { card: Card; qty: number }>();
+    for (const { card, qty } of filtered) {
+      const cur = byId.get(card.id);
+      if (cur) cur.qty += qty;
+      else byId.set(card.id, { card, qty });
     }
+    const list = Array.from(byId.entries()).map(([, entry]) => entry);
 
-    // Tri : héros par faction, puis cartes par faction puis coût mana croissant
+    // Tri : 1) Héros en premier, 2) puis les cartes ; dans chaque groupe : faction → coût main croissant → alphabétique (nom FR)
     list.sort((a, b) => {
       const isHeroA = a.card.type === "HERO";
       const isHeroB = b.card.type === "HERO";
       if (isHeroA && !isHeroB) return -1;
       if (!isHeroA && isHeroB) return 1;
-      if (isHeroA && isHeroB) {
-        return factionIndex(a.card.faction) - factionIndex(b.card.faction);
-      }
+
       const facA = factionIndex(a.card.faction);
       const facB = factionIndex(b.card.faction);
       if (facA !== facB) return facA - facB;
       const costA = a.card.mainCost ?? 999;
       const costB = b.card.mainCost ?? 999;
-      return costA - costB;
+      if (costA !== costB) return costA - costB;
+      return a.card.nameFr.localeCompare(b.card.nameFr, "fr");
     });
     return list;
-  }, [filtered, groupByName]);
+  }, [filtered]);
 
   if (toShow.length === 0) {
     return (

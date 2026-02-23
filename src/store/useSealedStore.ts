@@ -14,7 +14,7 @@ export interface CollectionEntry {
 
 interface SealedState {
   seed: string;
-  numDecks: number;
+  numBoosters: number;
   boostersPerDeck: number;
   collection: Map<string, CollectionEntry>;
   deck: DeckState;
@@ -23,8 +23,8 @@ interface SealedState {
   pools: ReturnType<typeof buildPools> | null;
   lastValidation: ValidationResult | null;
   setSeed: (seed: string) => void;
-  setNumDecks: (n: number) => void;
-  openBoosters: () => void;
+  setNumBoosters: (n: number) => void;
+  openBoosters: (randomSeed?: boolean) => void;
   addToDeck: (cardId: string, isToken: boolean, qty?: number) => void;
   removeFromDeck: (cardId: string, isToken: boolean, qty?: number) => void;
   setHero: (cardId: string | undefined) => void;
@@ -45,7 +45,7 @@ export const useSealedStore = create<SealedState>()(
   persist(
     (set, get) => ({
       seed: randomSeed(),
-      numDecks: 1,
+      numBoosters: 1,
       boostersPerDeck: getBoostersPerDeck(),
       collection: new Map(),
       deck: emptyDeck,
@@ -58,8 +58,8 @@ export const useSealedStore = create<SealedState>()(
         set({ seed: s });
       },
 
-      setNumDecks(n: number) {
-        set({ numDecks: Math.max(1, Math.min(50, n)) });
+      setNumBoosters(n: number) {
+        set({ numBoosters: Math.max(1, Math.min(50, n)) });
       },
 
       initCards(cards: Card[]) {
@@ -68,11 +68,13 @@ export const useSealedStore = create<SealedState>()(
         set({ cards, cardsById, pools });
       },
 
-      openBoosters() {
-        const { seed, numDecks, pools, cards } = get();
+      openBoosters(useRandomSeed = false) {
+        const { numBoosters, pools, cards } = get();
         if (!pools || cards.length === 0) return;
-        const collection = openSealedDecks(numDecks, seed, pools);
-        set({ collection });
+        const newSeed = useRandomSeed ? randomSeed() : get().seed;
+        if (useRandomSeed) set({ seed: newSeed });
+        const collection = openSealedDecks(numBoosters, newSeed, pools);
+        set({ collection, deck: emptyDeck, lastValidation: null });
       },
 
       addToDeck(cardId: string, isToken: boolean, qty = 1) {
@@ -189,10 +191,17 @@ export const useSealedStore = create<SealedState>()(
       name: STORAGE_KEY,
       partialize: (s) => ({
         seed: s.seed,
-        numDecks: s.numDecks,
+        numBoosters: s.numBoosters,
         deck: s.deck,
       }),
-      // Zustand persist doesn't support Map; we re-hydrate collection/cards from JSON at runtime
+      merge: (persisted, current) => {
+        const p = persisted as { seed?: string; numBoosters?: number; numDecks?: number; deck?: DeckState };
+        return {
+          ...current,
+          ...persisted,
+          numBoosters: p.numBoosters ?? (p.numDecks != null ? p.numDecks * getBoostersPerDeck() : undefined) ?? current.numBoosters,
+        };
+      },
     }
   )
 );

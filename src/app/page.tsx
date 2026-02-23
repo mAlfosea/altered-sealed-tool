@@ -10,14 +10,12 @@ import { Button } from "@/components/ui/button";
 import { useSealedStore } from "@/store/useSealedStore";
 import type { Card } from "@/lib/types";
 import type { CollectionEntry } from "@/store/useSealedStore";
-import { Download } from "lucide-react";
 
 export default function Home() {
   const [search, setSearch] = useState("");
-  const [factionFilter, setFactionFilter] = useState("");
-  const [rarityFilter, setRarityFilter] = useState("");
-  const [typeFilter, setTypeFilter] = useState("");
-  const [groupByName, setGroupByName] = useState(true);
+  const [activeFactions, setActiveFactions] = useState<string[]>([]);
+  const [activeRarities, setActiveRarities] = useState<string[]>([]);
+  const [activeTypes, setActiveTypes] = useState<string[]>([]);
   const [exportOpen, setExportOpen] = useState(false);
   const [cardsLoaded, setCardsLoaded] = useState(false);
 
@@ -47,61 +45,55 @@ export default function Home() {
   const collectionEntries: CollectionEntry[] = Array.from(collection.values());
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card px-4 py-3">
-        <h1 className="text-xl font-bold">Simulateur Scellé Altered</h1>
-        <p className="text-sm text-muted-foreground">
-          Les Graines de l&apos;Unité (DUSTER) — Ouvrez des boosters, construisez votre deck, exportez pour TCG Arena.
-        </p>
+    <div className="flex h-screen flex-col bg-background overflow-hidden">
+      <header className="shrink-0 border-b bg-card px-4 py-3">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-bold">Simulateur Scellé Altered</h1>
+            <p className="text-sm text-muted-foreground">
+              Les Graines de l&apos;Unité (DUSTER) — Ouvrez des boosters, construisez votre deck, exportez pour TCG Arena.
+            </p>
+          </div>
+          <div className="min-w-0 shrink-0">
+            <BoosterConfigBar inline />
+          </div>
+        </div>
       </header>
 
-      <main className="mx-auto max-w-[1600px] px-4 py-4">
-        <div className="mb-4">
-          <BoosterConfigBar />
-        </div>
-
+      <main className="flex min-h-0 flex-1 flex-col mx-auto w-full max-w-[1600px] px-4 pt-4 overflow-hidden">
         {!cardsLoaded ? (
-          <p className="py-8 text-center text-muted-foreground">
-            Chargement des cartes…
-          </p>
+          <div className="flex flex-1 items-center justify-center">
+            <p className="text-muted-foreground">Chargement des cartes…</p>
+          </div>
         ) : (
-          <div className="flex gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="mb-3">
+          <div className="flex min-h-0 flex-1 gap-4 overflow-hidden">
+            <div className="flex min-h-0 flex-1 flex-col min-w-0 overflow-hidden">
+              <div className="shrink-0 mb-3">
                 <FiltersBar
                   search={search}
                   onSearch={setSearch}
-                  factionFilter={factionFilter}
-                  onFactionFilter={setFactionFilter}
-                  rarityFilter={rarityFilter}
-                  onRarityFilter={setRarityFilter}
-                  typeFilter={typeFilter}
-                  onTypeFilter={setTypeFilter}
-                  groupByName={groupByName}
-                  onGroupByName={setGroupByName}
+                  activeFactions={activeFactions}
+                  onFactionsChange={setActiveFactions}
+                  activeRarities={activeRarities}
+                  onRaritiesChange={setActiveRarities}
+                  activeTypes={activeTypes}
+                  onTypesChange={setActiveTypes}
                 />
               </div>
-              <CollectionGrid
-                entries={collectionEntries}
-                search={search}
-                factionFilter={factionFilter}
-                rarityFilter={rarityFilter}
-                typeFilter={typeFilter}
-                groupByName={groupByName}
-                onAddCard={addToDeck}
-                onRemoveCard={removeFromDeck}
-              />
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <CollectionGrid
+                  entries={collectionEntries}
+                  search={search}
+                  activeFactions={activeFactions}
+                  activeRarities={activeRarities}
+                  activeTypes={activeTypes}
+                  onAddCard={addToDeck}
+                  onRemoveCard={removeFromDeck}
+                />
+              </div>
             </div>
-            <aside className="w-80 shrink-0">
-              <DeckPanel />
-              <Button
-                className="mt-3 w-full"
-                variant="outline"
-                onClick={() => setExportOpen(true)}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Exporter TCG Arena
-              </Button>
+            <aside className="flex h-full w-80 shrink-0 flex-col min-h-0">
+              <DeckPanel onExportClick={() => setExportOpen(true)} />
             </aside>
           </div>
         )}

@@ -45,7 +45,7 @@ export function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="relative max-h-[90vh] flex flex-col">
+      <DialogContent className="top-8 left-1/2 max-h-[90vh] -translate-x-1/2 translate-y-0 flex flex-col">
         <DialogHeader>
           <DialogTitle>Exporter pour TCG Arena</DialogTitle>
           <DialogDescription>

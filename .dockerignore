@@ -1,0 +1,41 @@
+# Dépendances
+node_modules
+.pnpm-store
+npm-debug.log*
+pnpm-debug.log*
+
+# Build Next.js (reconstruit dans l'image)
+.next
+out
+
+# IDE / OS
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Env / secrets (ne jamais les inclure dans l'image)
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# Tests / couverture
+coverage
+*.tsbuildinfo
+.ingest-cache
+
+# Documentation / divers
+README.md
+*.md
+.editorconfig
+
+# Docker (éviter les contextes imbriqués)
+Dockerfile*
+docker-compose*
+.dockerignore

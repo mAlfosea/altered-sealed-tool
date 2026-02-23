@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"src/**/*.{ts,tsx,json}\" \"scripts/**/*.ts\"",
-    "ingest": "npx tsx scripts/ingest-duster.ts",
+    "ingest": "npx tsx scripts/ingest-from-altered-db.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
