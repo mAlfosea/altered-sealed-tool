@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Card } from "@/lib/types";
 import { cardDisplayName } from "@/lib/types";
 import { useSealedStore } from "@/store/useSealedStore";
@@ -48,6 +48,16 @@ export function DeckPanel({ onExportClick }: DeckPanelProps) {
     setHoveredCard(card);
     setAnchorRect(card && el ? (el.getBoundingClientRect() as AnchorRect) : null);
   };
+
+  // Fermer la preview si la carte survolée n'est plus dans le deck (ex. dernière copie supprimée)
+  useEffect(() => {
+    if (!hoveredCard) return;
+    const inDeck =
+      deck.heroCardId === hoveredCard.id ||
+      (deck.main[hoveredCard.id] ?? 0) > 0 ||
+      (deck.tokens[hoveredCard.id] ?? 0) > 0;
+    if (!inDeck) setHover(null, null);
+  }, [deck, hoveredCard]);
 
   const factions = useMemo(
     () => getDeckFactions(deck, cardsById),
