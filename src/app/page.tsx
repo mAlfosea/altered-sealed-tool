@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BoosterConfigBar } from "../components/BoosterConfigBar";
-import { FiltersBar } from "../components/FiltersBar";
-import { CollectionGrid } from "../components/CollectionGrid";
-import { DeckPanel } from "../components/DeckPanel";
-import { ExportDialog } from "../components/ExportDialog";
-import { Button } from "../components/ui/button";
-import { useSealedStore } from "../store/useSealedStore";
-import type { Card } from "../lib/types";
-import type { CollectionEntry } from "../store/useSealedStore";
+import { BoosterConfigBar } from "components/BoosterConfigBar";
+import { FiltersBar } from "components/FiltersBar";
+import { CollectionGrid } from "components/CollectionGrid";
+import { DeckPanel } from "components/DeckPanel";
+import { ExportDialog } from "components/ExportDialog";
+import { Button } from "components/ui/button";
+import { useSealedStore } from "store/useSealedStore";
+import type { Card } from "lib/types";
+import type { CollectionEntry } from "store/useSealedStore";
 
 export default function Home() {
   const [search, setSearch] = useState("");

@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "../lib/utils";
+import { cn } from "lib/utils";
 
 const iconClass = "size-5 shrink-0";
 
