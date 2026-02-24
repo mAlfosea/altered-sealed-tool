@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import type { Card } from "lib/types";
-import { cardDisplayName } from "lib/types";
+import type { Card } from "@/lib/types";
+import { cardDisplayName } from "@/lib/types";
 
 export interface AnchorRect {
   top: number;

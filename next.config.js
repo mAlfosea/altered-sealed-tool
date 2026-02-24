@@ -5,13 +5,11 @@ const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
   webpack: (config) => {
-    const src = path.join(__dirname, "src");
+    const root = path.resolve(process.cwd());
+    const srcDir = path.join(root, "src");
     config.resolve.alias = {
       ...config.resolve.alias,
-      "@": src,
-      "lib": path.join(src, "lib"),
-      "store": path.join(src, "store"),
-      "components": path.join(src, "components"),
+      "@": srcDir,
     };
     return config;
   },

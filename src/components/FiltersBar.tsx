@@ -1,9 +1,9 @@
 "use client";
 
-import { Input } from "components/ui/input";
+import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { cn } from "lib/utils";
-import { FACTION_ICONS } from "components/FactionIcons";
+import { cn } from "@/lib/utils";
+import { FACTION_ICONS } from "@/components/FactionIcons";
 
 interface FiltersBarProps {
   search: string;

@@ -8,11 +8,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "components/ui/dialog";
-import { Button } from "components/ui/button";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { exportToArenaFormat } from "lib/exportArena";
-import { useSealedStore } from "store/useSealedStore";
+import { exportToArenaFormat } from "@/lib/exportArena";
+import { useSealedStore } from "@/store/useSealedStore";
 
 interface ExportDialogProps {
   open: boolean;

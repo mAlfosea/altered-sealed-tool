@@ -1,15 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Card } from "lib/types";
-import { cardDisplayName } from "lib/types";
-import type { CollectionEntry } from "store/useSealedStore";
-import { Card as CardUi } from "components/ui/card";
-import { Badge } from "components/ui/badge";
-import { useSealedStore } from "store/useSealedStore";
-import { cn } from "lib/utils";
-import type { AnchorRect } from "components/CardHoverPreview";
-import { CardHoverPreview } from "components/CardHoverPreview";
+import type { Card } from "@/lib/types";
+import { cardDisplayName } from "@/lib/types";
+import type { CollectionEntry } from "@/store/useSealedStore";
+import { Card as CardUi } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useSealedStore } from "@/store/useSealedStore";
+import { cn } from "@/lib/utils";
+import type { AnchorRect } from "@/components/CardHoverPreview";
+import { CardHoverPreview } from "@/components/CardHoverPreview";
 
 /** Ordre des factions pour le tri (héros puis cartes). */
 const FACTION_ORDER = ["AX", "BR", "LY", "MU", "OR", "YZ", "NEUTRAL", "NE"];

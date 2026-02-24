@@ -1,16 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Card } from "lib/types";
-import { cardDisplayName } from "lib/types";
-import { useSealedStore } from "store/useSealedStore";
-import { getDeckFactions } from "lib/deckValidation";
-import { getFactionBorderClass, getFactionBorderStyle, getFactionBgStyle } from "lib/factionColors";
-import { Button } from "components/ui/button";
-import { Card as CardUi } from "components/ui/card";
-import { Badge } from "components/ui/badge";
-import type { AnchorRect } from "components/CardHoverPreview";
-import { CardHoverPreview } from "components/CardHoverPreview";
+import type { Card } from "@/lib/types";
+import { cardDisplayName } from "@/lib/types";
+import { useSealedStore } from "@/store/useSealedStore";
+import { getDeckFactions } from "@/lib/deckValidation";
+import { getFactionBorderClass, getFactionBorderStyle, getFactionBgStyle } from "@/lib/factionColors";
+import { Button } from "@/components/ui/button";
+import { Card as CardUi } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import type { AnchorRect } from "@/components/CardHoverPreview";
+import { CardHoverPreview } from "@/components/CardHoverPreview";
 import { Download, Minus, Star, Trash2 } from "lucide-react";
 
 const MAX_FACTIONS = 3;
