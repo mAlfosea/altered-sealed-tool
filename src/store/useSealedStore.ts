@@ -195,10 +195,10 @@ export const useSealedStore = create<SealedState>()(
         deck: s.deck,
       }),
       merge: (persisted, current) => {
-        const p = persisted as { seed?: string; numBoosters?: number; numDecks?: number; deck?: DeckState };
+        const p = (persisted && typeof persisted === "object" ? persisted : {}) as { seed?: string; numBoosters?: number; numDecks?: number; deck?: DeckState };
         return {
           ...current,
-          ...persisted,
+          ...p,
           numBoosters: p.numBoosters ?? (p.numDecks != null ? p.numDecks * getBoostersPerDeck() : undefined) ?? current.numBoosters,
         };
       },

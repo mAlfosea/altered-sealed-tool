@@ -28,7 +28,7 @@ export function BoosterConfigBar({ inline }: BoosterConfigBarProps) {
     let rares = 0;
     let heroes = 0;
     let tokens = 0;
-    for (const { card, qty } of collection.values()) {
+    for (const { card, qty } of Array.from(collection.values())) {
       if (card.type === "HERO") heroes += qty;
       else if (card.type === "TOKEN" || card.type === "MANA") tokens += qty;
       else if (card.rarity === "COMMON") commons += qty;

@@ -118,10 +118,9 @@ export function FiltersBar(props: FiltersBarProps) {
               style={active ? { backgroundColor: opt.hex, borderColor: opt.hex } : undefined}
             >
               {Icon && (
-                <Icon
-                  className={active ? "text-white" : undefined}
-                  style={!active ? { color: opt.hex } : undefined}
-                />
+                <span className={active ? "text-white" : undefined} style={!active ? { color: opt.hex } : undefined}>
+                  <Icon className="size-5" />
+                </span>
               )}
             </button>
           );
