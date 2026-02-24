@@ -10,7 +10,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# uniquement lib à la racine (pas src/lib)
+/lib/
 lib64/
 parts/
 sdist/
