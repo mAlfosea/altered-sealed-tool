@@ -1,7 +1,7 @@
-import type { Card, DeckState } from "@/lib/types";
-import { openSealedDecks, buildPools, getBoostersPerDeck } from "@/lib/booster";
-import { validateDeck } from "@/lib/deckValidation";
-import type { ValidationResult } from "@/lib/deckValidation";
+import type { Card, DeckState } from "../lib/types";
+import { openSealedDecks, buildPools, getBoostersPerDeck } from "../lib/booster";
+import { validateDeck } from "../lib/deckValidation";
+import type { ValidationResult } from "../lib/deckValidation";
 import { persist } from "zustand/middleware";
 import { create } from "zustand";
 
