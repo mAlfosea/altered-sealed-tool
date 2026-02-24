@@ -4,15 +4,22 @@ const path = require("path");
 const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
-  webpack: (config) => {
-    const root = path.resolve(process.cwd());
+  webpack: (config, { defaultLoaders }) => {
+    const root = path.resolve(__dirname);
     const srcDir = path.join(root, "src");
 
+    // Alias @ vers src (fallback si resolve.modules insuffisant)
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       "@": srcDir,
-      "lib": path.join(srcDir, "lib"),
     };
+
+    // Résolution depuis src/ en priorité (fonctionne en Docker / build Git)
+    config.resolve.modules = [
+      srcDir,
+      "node_modules",
+      ...(config.resolve.modules || []),
+    ];
 
     return config;
   },

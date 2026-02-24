@@ -7,8 +7,7 @@ COPY package.json package-lock.json* ./
 
 RUN npm ci
 
-COPY next.config.js tsconfig.json postcss.config.js tailwind.config.ts ./
-COPY src ./src
+COPY . .
 RUN mkdir -p public
 
 ENV NEXT_TELEMETRY_DISABLED=1
