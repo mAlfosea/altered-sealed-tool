@@ -7,10 +7,13 @@ const nextConfig = {
   webpack: (config) => {
     const root = path.resolve(process.cwd());
     const srcDir = path.join(root, "src");
+
     config.resolve.alias = {
-      ...config.resolve.alias,
+      ...(config.resolve.alias || {}),
       "@": srcDir,
+      "lib": path.join(srcDir, "lib"),
     };
+
     return config;
   },
 };
